@@ -25,4 +25,14 @@ go build -o chronos main.go
 ```bash
 ./chronos
 ```
-# Chronos
+## Write articles
+Articles are stored in the `articles` folder. The folder structure is the following:
+```
+articles
+├── en
+│   └── article1.md
+└── it
+    └── article1.md
+```
+
+You can use a Git repository to store your articles. Just set the `gitrepo` property in the `config/chronos.json` file and ensure that the `articles` folder is present in the repository.
