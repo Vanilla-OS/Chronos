@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="chronos.svg" height="64">
+    <img src="chronos.svg" height="128">
     <h1>Chronos</h1>
     <p>A simple, fast and lightweight documentation server written in Go.</p>
     <hr />
