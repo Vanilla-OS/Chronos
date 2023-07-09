@@ -1,5 +1,10 @@
-# Chronos
-A simple, fast and lightweight documentation server written in Go.
+<div align="center">
+    <img src="chronos.svg" height="64">
+    <h1>Chronos</h1>
+    <p>A simple, fast and lightweight documentation server written in Go.</p>
+    <hr />
+</div>
+
 
 ## Features
 - API based response
