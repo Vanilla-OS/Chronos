@@ -142,16 +142,28 @@ func getArticleList() ([]string, error) {
 
 			remotes, err := r.Remotes()
 			if err != nil {
-        return nil, fmt.Errorf("failed to find Git remote settings: %v", err)
+				return nil, fmt.Errorf("failed to find Git remote settings: %v", err)
 			}
 
-      origin := remotes[0].Config().URLs[0]
-      
-      if origin != settings.Cnf.GitRepo {
-      //not the same origin
-      //overwrite 
-        return nil, nil
-      }
+			origin := remotes[0].Config().URLs[0]
+
+			if origin != settings.Cnf.GitRepo {
+				confirmation := askForConfirmation("The repository has changed, do you want to overwrite `articles_repo?`")
+
+				if confirmation {
+          err := os.RemoveAll(repoDir)
+          if err != nil {
+            return nil, fmt.Errorf("failed to remove old Git repository: %v", err)
+          }
+
+          _, err = git.PlainClone(repoDir, false, &git.CloneOptions{
+						URL: settings.Cnf.GitRepo,
+					})
+					if err != nil {
+						return nil, fmt.Errorf("failed to clone Git repository: %v", err)
+					}
+				} 
+			}
 
 			w, err := r.Worktree()
 			if err != nil {
