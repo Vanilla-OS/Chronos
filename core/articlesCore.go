@@ -140,6 +140,19 @@ func getArticleList() ([]string, error) {
 				return nil, fmt.Errorf("failed to open Git repository: %v", err)
 			}
 
+			remotes, err := r.Remotes()
+			if err != nil {
+        return nil, fmt.Errorf("failed to find Git remote settings: %v", err)
+			}
+
+      origin := remotes[0].Config().URLs[0]
+      
+      if origin != settings.Cnf.GitRepo {
+      //not the same origin
+      //overwrite 
+        return nil, nil
+      }
+
 			w, err := r.Worktree()
 			if err != nil {
 				return nil, fmt.Errorf("failed to open Git worktree: %v", err)
