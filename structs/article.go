@@ -20,6 +20,7 @@ type Article struct {
 	Language        string
 	Path            string
 	Url             string
+	Slug            string
 }
 
 // ParseBody parses the body of an article and converts it from Markdown to HTML.

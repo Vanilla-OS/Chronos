@@ -38,6 +38,7 @@ func loadArticle(path string) (structs.Article, error) {
 	body := parts[1]
 
 	title, description, publicationDate, authors := parseArticleHeader(header)
+	slug := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 
 	article := structs.Article{
 		Title:           title,
@@ -47,6 +48,7 @@ func loadArticle(path string) (structs.Article, error) {
 		Body:            body,
 		Path:            path,
 		Url:             strings.TrimSuffix(path, filepath.Ext(path)),
+		Slug:            slug,
 	}
 
 	return article, nil
