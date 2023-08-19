@@ -41,3 +41,92 @@ articles
 ```
 
 You can use a Git repository to store your articles. Just set the `gitrepo` property in the `config/chronos.json` file and ensure that the `articles` folder is present in the repository.
+
+## API Reference
+
+### Get Status
+
+Get the status of the server.
+
+- **URL**: `http://localhost:8080/`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "status": "ok"
+}
+```
+
+### Get Articles
+
+Get a list of articles, grouped by language.
+
+- **URL**: `http://localhost:8080/articles`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "title": "Chronos",
+  "SupportedLang": ["en", "it"],
+  "groupedArticles": {
+    "en": {
+      "articles_repo/articles/en/test.md": {
+        "Title": "Test Article",
+        "Description": "This is a test article written in English.",
+        "PublicationDate": "2023-06-10",
+        "Authors": ["mirkobrombin"],
+        "Body": "..."
+      }
+    },
+    "it": {
+      "articles_repo/articles/it/test.md": {
+        "Title": "Articolo di Test",
+        "Description": "Questo è un articolo di test scritto in italiano.",
+        "PublicationDate": "2023-06-10",
+        "Authors": ["mirkobrombin"],
+        "Body": "..."
+      }
+    }
+  }
+}
+```
+
+### Get Article by Language and Slug
+
+Get a specific article by providing its language and slug.
+
+- **URL**: `http://localhost:8080/articles/en/test`
+  (or `http://localhost:8080/articles/test` based on browser language)
+- **Method**: GET
+- **Response**:
+```json
+{
+  "Title": "Test Article",
+  "Description": "This is a test article written in English.",
+  "PublicationDate": "2023-06-10",
+  "Authors": ["mirkobrombin"],
+  "Body": "..."
+}
+```
+
+### Search Articles
+
+Search articles based on a query string.
+
+- **URL**: `http://localhost:8080/search?q=test`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "query": "test",
+  "results": [
+    {
+      "Title": "Test Article",
+      "Description": "This is a test article written in English.",
+      "PublicationDate": "2023-06-10",
+      "Authors": ["mirkobrombin"],
+      "Body": "..."
+    }
+  ]
+}
+```
