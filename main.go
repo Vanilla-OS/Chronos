@@ -33,14 +33,26 @@ func main() {
 		return
 	}
 
+	// CORS middleware
+	corsMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			next.ServeHTTP(w, r)
+		})
+	}
+
 	// Define router with routes and their handlers
 	r := mux.NewRouter()
+	r.Use(corsMiddleware)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok"}`))
 	})
+	r.HandleFunc("/langs", core.HandleLangs)
 	r.HandleFunc("/articles", core.HandleArticles)
 	r.HandleFunc("/articles/{lang}/{article}", core.HandleArticle)
 	r.HandleFunc("/articles/{article}", core.HandleArticle)

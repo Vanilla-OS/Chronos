@@ -63,7 +63,7 @@ func isLanguageSupported(lang string) bool {
 // searchArticleCacheByLang searches the article cache for an article with the specified name and language.
 func searchArticleCacheByLang(articlePath, lang string) ([]structs.Article, bool) {
 	for _, article := range ArticleCacheGrouped[lang] {
-		if strings.Contains(strings.ToLower(article.Title), strings.ToLower(articlePath)) {
+		if article.Slug == articlePath {
 			return []structs.Article{article}, true
 		}
 	}

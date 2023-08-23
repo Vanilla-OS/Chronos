@@ -39,14 +39,7 @@ func HandleArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	results, ok := searchArticleCacheByLang(article, lang)
-	if !ok {
-		// Redirect to /en if the article doesn't exist in the specified language
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
-
-	if len(results) == 0 {
-		// Redirect to /en if the article doesn't exist in the specified language
+	if !ok || len(results) == 0 {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}

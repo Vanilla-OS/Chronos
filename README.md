@@ -91,6 +91,19 @@ Get a list of articles, grouped by language.
 }
 ```
 
+### Get Supported Languages
+
+Get a list of supported languages.
+
+- **URL**: `http://localhost:8080/langs`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "SupportedLang": ["en", "it"]
+}
+```
+
 ### Get Article by Language and Slug
 
 Get a specific article by providing its language and slug.
