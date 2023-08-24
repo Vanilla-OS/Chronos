@@ -182,6 +182,13 @@ func getArticleList() ([]string, error) {
 		articlesDir = filepath.Join(repoDir, "articles")
 	}
 
+	// Populate supported languages based on the available articles
+	err := PopulateSupportedLanguages()
+	if err != nil {
+		fmt.Println("Error populating supported languages:", err)
+		return nil, err
+	}
+
 	for _, lang := range SupportedLang {
 		langDir := filepath.Join(articlesDir, lang)
 		dirEntries, err := os.ReadDir(langDir)

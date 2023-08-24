@@ -10,6 +10,7 @@ package core
 */
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -42,6 +43,7 @@ func PopulateSupportedLanguages() error {
 	}
 
 	for _, entry := range dirEntries {
+		fmt.Println(entry.Name())
 		if entry.IsDir() {
 			SupportedLang = append(SupportedLang, entry.Name())
 		}

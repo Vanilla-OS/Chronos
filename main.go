@@ -19,15 +19,8 @@ import (
 )
 
 func main() {
-	// Populate supported languages based on the available articles
-	err := core.PopulateSupportedLanguages()
-	if err != nil {
-		fmt.Println("Error populating supported languages:", err)
-		return
-	}
-
 	// Populate articles cache
-	err = core.PopulateArticleCache()
+	err := core.PopulateArticleCache()
 	if err != nil {
 		fmt.Println("Error populating articles cache:", err)
 		return
