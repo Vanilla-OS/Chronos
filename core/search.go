@@ -26,7 +26,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 
 	lang := getPreferredLanguage(r)
 
-	res, ok := searchArticleCacheByLang(query, lang)
+	res, ok := searchArticlesCacheByLang(query, lang)
 	if !ok {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return

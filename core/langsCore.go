@@ -70,3 +70,22 @@ func searchArticleCacheByLang(articlePath, lang string) ([]structs.Article, bool
 
 	return nil, false
 }
+
+// searchArticlesCacheByLang searches the article cache for articles with the specified language.
+// This function is the same searchArticleCacheByLang, but it returns all the matches and
+// it's based on both slug and title.
+func searchArticlesCacheByLang(query string, lang string) ([]structs.Article, bool) {
+	var results []structs.Article
+
+	for _, article := range ArticleCacheGrouped[lang] {
+		if strings.Contains(article.Title, query) || strings.Contains(article.Slug, query) {
+			results = append(results, article)
+		}
+	}
+
+	if len(results) > 0 {
+		return results, true
+	}
+
+	return nil, false
+}
