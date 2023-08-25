@@ -18,6 +18,8 @@ import (
 	"github.com/vanilla-os/Chronos/settings"
 )
 
+var version = "0.2.0"
+
 func main() {
 	core.LoadChronos()
 
@@ -38,7 +40,7 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		w.Write([]byte(`{"status": "ok", "version": "` + version + `"}`))
 	})
 	r.HandleFunc("/{repoId}", core.HandleRepo)
 	r.HandleFunc("/{repoId}/langs", core.HandleLangs)
