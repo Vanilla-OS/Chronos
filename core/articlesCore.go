@@ -93,6 +93,7 @@ func PopulateArticleCache() error {
 		return err
 	}
 
+	fmt.Println("Loading articles...")
 	tmpArticleCache := make(map[string]structs.Article)
 	tmpArticleCacheGrouped := make(map[string]map[string]structs.Article)
 	for _, articlePath := range articlePaths {
@@ -112,7 +113,10 @@ func PopulateArticleCache() error {
 		}
 
 		tmpArticleCacheGrouped[lang][articlePath] = article
+		fmt.Printf("- [%s] \"%s\" found\n", lang, article.Title)
 	}
+
+	fmt.Println("Articles loaded.")
 
 	ArticleCache = tmpArticleCache
 	ArticleCacheGrouped = tmpArticleCacheGrouped

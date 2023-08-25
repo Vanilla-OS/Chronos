@@ -15,7 +15,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vanilla-os/Chronos/structs"
 	"golang.org/x/text/language"
 )
 
@@ -42,17 +41,19 @@ func PopulateSupportedLanguages() error {
 		return err
 	}
 
+	fmt.Println("Loading supported languages...")
 	for _, entry := range dirEntries {
-		fmt.Println(entry.Name())
 		if entry.IsDir() {
 			SupportedLang = append(SupportedLang, entry.Name())
+			fmt.Printf("- [%s] found\n", entry.Name())
 		}
 	}
+	fmt.Println("Supported languages loaded.")
 
 	return nil
 }
 
-// isLanguageSupported checks if a given language is supported.
+// isLanguageSupported checks if a given language is in the list of supported languages.
 func isLanguageSupported(lang string) bool {
 	for _, l := range SupportedLang {
 		if l == lang {
@@ -60,34 +61,4 @@ func isLanguageSupported(lang string) bool {
 		}
 	}
 	return false
-}
-
-// searchArticleCacheByLang searches the article cache for an article with the specified name and language.
-func searchArticleCacheByLang(articlePath, lang string) ([]structs.Article, bool) {
-	for _, article := range ArticleCacheGrouped[lang] {
-		if article.Slug == articlePath {
-			return []structs.Article{article}, true
-		}
-	}
-
-	return nil, false
-}
-
-// searchArticlesCacheByLang searches the article cache for articles with the specified language.
-// This function is the same searchArticleCacheByLang, but it returns all the matches and
-// it's based on both slug and title.
-func searchArticlesCacheByLang(query string, lang string) ([]structs.Article, bool) {
-	var results []structs.Article
-
-	for _, article := range ArticleCacheGrouped[lang] {
-		if strings.Contains(article.Title, query) || strings.Contains(article.Slug, query) {
-			results = append(results, article)
-		}
-	}
-
-	if len(results) > 0 {
-		return results, true
-	}
-
-	return nil, false
 }
