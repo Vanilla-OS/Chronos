@@ -22,7 +22,6 @@ jobs:
         run: echo "sha_short=$(git rev-parse --short HEAD) >> $GITHUB_OUTPUT"
 
       - name: Build the Docker image
-        working-directory: src/
         run: docker build . --file Containerfile --tag vanilla-os/chronos:${{ github.ref_name }}
 
       # Push the image to GHCR (Image Registry)
