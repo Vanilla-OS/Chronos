@@ -26,7 +26,7 @@ jobs:
         run: docker build . --file Containerfile --tag vanilla-os/chronos:${{ github.ref_name }}
 
       # Push the image to GHCR (Image Registry)
-    - name: Push To GHCR
-      run: |
-         docker login ghcr.io -u ${{ env.REGISTRY_USER }} -p ${{ env.REGISTRY_PASSWORD }}
-         docker image push "ghcr.io/vanilla-os/chronos:${{ github.ref_name }}"
+      - name: Push To GHCR
+        run: |
+          docker login ghcr.io -u ${{ env.REGISTRY_USER }} -p ${{ env.REGISTRY_PASSWORD }}
+          docker image push "ghcr.io/vanilla-os/chronos:${{ github.ref_name }}"
