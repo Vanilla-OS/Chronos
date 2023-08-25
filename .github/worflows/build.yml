@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+env:
+    REGISTRY_USER: ${{ github.actor }}
+    REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '(skip)') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set variables
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD) >> $GITHUB_OUTPUT"
+
+      - name: Build the Docker image
+        working-directory: src/
+        run: docker build . --file Containerfile --tag vanilla-os/chronos:${{ github.ref_name }}
+
+      # Push the image to GHCR (Image Registry)
+    - name: Push To GHCR
+      run: |
+         docker login ghcr.io -u ${{ env.REGISTRY_USER }} -p ${{ env.REGISTRY_PASSWORD }}
+         docker image push "ghcr.io/vanilla-os/chronos:${{ github.ref_name }}"
