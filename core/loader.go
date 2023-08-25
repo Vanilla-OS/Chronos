@@ -76,6 +76,11 @@ func prepareRepos() error {
 			return err
 		}
 
+		_repo.ArticlesGrouped, err = groupArticles(_repo)
+		if err != nil {
+			return err
+		}
+
 		repos = append(repos, _repo)
 	}
 
@@ -91,6 +96,11 @@ func prepareRepos() error {
 		}
 
 		_repo.Articles, err = getRepoArticles(_repo)
+		if err != nil {
+			return err
+		}
+
+		_repo.ArticlesGrouped, err = groupArticles(_repo)
 		if err != nil {
 			return err
 		}
@@ -150,6 +160,16 @@ func getRepoArticles(repo structs.Repo) (map[string]structs.Article, error) {
 	}
 
 	return tmpArticleCache, nil
+}
+
+// groupArticles groups articles by language.
+func groupArticles(repo structs.Repo) (map[string][]structs.Article, error) {
+	tmpArticleCacheGrouped := make(map[string][]structs.Article)
+	for _, article := range repo.Articles {
+		tmpArticleCacheGrouped[article.Language] = append(tmpArticleCacheGrouped[article.Language], article)
+	}
+
+	return tmpArticleCacheGrouped, nil
 }
 
 // loadLanguagesFromRepo returns a list of languages from the repo folder.

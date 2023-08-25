@@ -39,10 +39,14 @@ func HandleArticles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !repo.IsLangSupported(lang) {
+		http.Redirect(w, r, fmt.Sprintf("/%s/articles/en", repoId), http.StatusFound)
+	}
+
 	response := structs.ArticlesResponse{
 		Title:         repo.Id,
 		SupportedLang: repo.Languages,
-		Articles:      repo.Articles,
+		Articles:      repo.ArticlesGrouped[lang],
 	}
 
 	w.Header().Set("Content-Type", "application/json")

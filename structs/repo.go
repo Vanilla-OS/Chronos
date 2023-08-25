@@ -16,3 +16,12 @@ type Repo struct {
 	ArticlesGrouped map[string][]Article
 	Languages       []string
 }
+
+func (r *Repo) IsLangSupported(lang string) bool {
+	for _, l := range r.Languages {
+		if l == lang {
+			return true
+		}
+	}
+	return false
+}
