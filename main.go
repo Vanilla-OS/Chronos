@@ -19,12 +19,7 @@ import (
 )
 
 func main() {
-	// Populate articles cache
-	err := core.PopulateArticleCache()
-	if err != nil {
-		fmt.Println("Error populating articles cache:", err)
-		return
-	}
+	core.LoadChronos()
 
 	// CORS middleware
 	corsMiddleware := func(next http.Handler) http.Handler {
@@ -45,11 +40,11 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok"}`))
 	})
-	r.HandleFunc("/langs", core.HandleLangs)
-	r.HandleFunc("/articles", core.HandleArticles)
-	r.HandleFunc("/articles/{lang}/{article}", core.HandleArticle)
-	r.HandleFunc("/articles/{article}", core.HandleArticle)
-	r.HandleFunc("/search", core.HandleSearch)
+	r.HandleFunc("/{repoId}", core.HandleRepo)
+	r.HandleFunc("/{repoId}/langs", core.HandleLangs)
+	r.HandleFunc("/{repoId}/articles/{lang}", core.HandleArticles)
+	r.HandleFunc("/{repoId}/articles/{lang}/{slug}", core.HandleArticle)
+	r.HandleFunc("/{repoId}/search/{lang}", core.HandleSearch)
 
 	http.Handle("/", r)
 

@@ -5,8 +5,19 @@ import (
 )
 
 type Config struct {
-	Port    string `json:"port"`
-	GitRepo string `json:"gitRepo"`
+	Port       string            `json:"port"`
+	GitRepos   []ConfigGitRepo   `json:"gitRepos"`
+	LocalRepos []ConfigLocalRepo `json:"localRepos"`
+}
+
+type ConfigGitRepo struct {
+	Id  string `json:"id"`
+	Url string `json:"url"`
+}
+
+type ConfigLocalRepo struct {
+	Id   string `json:"id"`
+	Path string `json:"path"`
 }
 
 var Cnf *Config
@@ -34,8 +45,21 @@ func init() {
 		panic(err)
 	}
 
+	var gitRepos []ConfigGitRepo
+	err = viper.UnmarshalKey("gitRepos", &gitRepos)
+	if err != nil {
+		panic(err)
+	}
+
+	var localRepos []ConfigLocalRepo
+	err = viper.UnmarshalKey("localRepos", &localRepos)
+	if err != nil {
+		panic(err)
+	}
+
 	Cnf = &Config{
-		Port:    viper.GetString("port"),
-		GitRepo: viper.GetString("gitRepo"),
+		Port:       viper.GetString("port"),
+		GitRepos:   gitRepos,
+		LocalRepos: localRepos,
 	}
 }

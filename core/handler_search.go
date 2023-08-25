@@ -11,39 +11,49 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
-	"github.com/vanilla-os/Chronos/structs"
+	"github.com/gorilla/mux"
 )
 
 // HandleSearch handles requests to /search.
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	repoId := vars["repoId"]
+	lang := vars["lang"]
+
 	query := r.URL.Query().Get("q")
 	if query == "" {
-		http.Redirect(w, r, "/", http.StatusFound)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	lang := getPreferredLanguage(r)
-
-	res, ok := searchArticlesCacheByLang(query, lang)
-	if !ok {
-		http.Redirect(w, r, "/", http.StatusFound)
+	if repoId == "" {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	response := structs.ResultsResponse{
-		Query:   query,
-		Results: res,
+	if lang == "" || !isValidLocale(lang) {
+		fmt.Println("Lang not found, redirecting to en")
+		http.Redirect(w, r, "/articles/"+repoId+"en/", http.StatusFound)
+	}
+
+	repo, err := getRepo(repoId)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	jsonData, err := json.Marshal(response)
+	results := searchArticles(repo.Id, lang, query)
+	jsonData, err := json.Marshal(results)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Write(jsonData)
+
 }

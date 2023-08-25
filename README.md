@@ -11,7 +11,9 @@
 - Markdown support
 - Search
 - Localized
-- Git based articles storage
+- Git based and/or local articles storage
+- Ristretto based cache (more cache backends coming soon)
+- Multi-repository support
 
 ## Configuration
 Edit the `config/chronos.json` file to configure the server.
@@ -30,17 +32,49 @@ go build -o chronos main.go
 ```bash
 ./chronos
 ```
-## Write articles
-Articles are stored in the `articles` folder. The folder structure is the following:
-```
-articles
-├── en
-│   └── article1.md
-└── it
-    └── article1.md
+## Repositories
+Chronos supports multiple repositories, both local and Git based. This allows you
+to have a single server for multiple projects or multiple repositories for a single project.
+
+Repositories can be configured in the `chronos.json` file as follows:
+```json
+{
+    "port": "8080",
+    "gitRepos": [
+        {
+            "id": "vosDocs",
+            "url": "https://github.com/Vanilla-OS/documentation"
+        }
+    ],
+    "localRepos": [
+        {
+            "id": "myAwesomeProject",
+            "path": "/myAwesomeProject/documentation"
+        }
+    ]
+}
 ```
 
-You can use a Git repository to store your articles. Just set the `gitrepo` property in the `config/chronos.json` file and ensure that the `articles` folder is present in the repository.
+Each repository must have a unique `id`, Chronos requires it to identify the repository
+when requesting articles.
+
+### Local repositories
+Each local repository must contain an `articles` folder with the following structure:
+```
+doumentation
+├──articles
+├─── en
+│    └─── article1.md
+└─── it
+     └─── article1.md
+```
+
+### Git repositories
+You can use a Git repositories as well, just add them to the `GitRepos` array in the `chronos.json` file,
+Chronos will automatically clone them and update on each restart.
+
+### Background updates
+In the current version, automatic updates are not supported.
 
 ## API Reference
 
@@ -57,18 +91,29 @@ Get the status of the server.
 }
 ```
 
-### Get Articles
+Check if a repository is available.
 
-Get a list of articles, grouped by language.
-
-- **URL**: `http://localhost:8080/articles`
+- **URL**: `http://localhost:8080/{repoId}`
 - **Method**: GET
 - **Response**:
 ```json
 {
-  "title": "Chronos",
+  "status": "ok"
+}
+```
+
+### Get Articles
+
+Get a list of articles, grouped by language.
+
+- **URL**: `http://localhost:8080/{repoId}/articles/{lang}`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "title": "repoId",
   "SupportedLang": ["en", "it"],
-  "groupedArticles": {
+  "articles": {
     "en": {
       "articles_repo/articles/en/test.md": {
         "Title": "Test Article",
@@ -95,7 +140,7 @@ Get a list of articles, grouped by language.
 
 Get a list of supported languages.
 
-- **URL**: `http://localhost:8080/langs`
+- **URL**: `http://localhost:8080/{repoId}/langs`
 - **Method**: GET
 - **Response**:
 ```json
@@ -108,8 +153,7 @@ Get a list of supported languages.
 
 Get a specific article by providing its language and slug.
 
-- **URL**: `http://localhost:8080/articles/en/test`
-  (or `http://localhost:8080/articles/test` based on browser language)
+- **URL**: `http://localhost:8080/{repoId}/articles/en/test`
 - **Method**: GET
 - **Response**:
 ```json
@@ -126,20 +170,17 @@ Get a specific article by providing its language and slug.
 
 Search articles based on a query string.
 
-- **URL**: `http://localhost:8080/search?q=test`
+- **URL**: `http://localhost:8080/{repoId}/search/{lang}?q=test`
 - **Method**: GET
 - **Response**:
 ```json
-{
-  "query": "test",
-  "results": [
-    {
-      "Title": "Test Article",
-      "Description": "This is a test article written in English.",
-      "PublicationDate": "2023-06-10",
-      "Authors": ["mirkobrombin"],
-      "Body": "..."
-    }
-  ]
-}
+[
+  {
+    "Title": "Test Article",
+    "Description": "This is a test article written in English.",
+    "PublicationDate": "2023-06-10",
+    "Authors": ["mirkobrombin"],
+    "Body": "..."
+  }
+]
 ```

@@ -12,10 +12,26 @@ package core
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func HandleLangs(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	repoId := vars["repoId"]
+
+	repo, err := getRepo(repoId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(repo.Languages)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(SupportedLang)
+	w.Write(jsonData)
 }

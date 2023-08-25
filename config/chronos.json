@@ -1,4 +1,10 @@
 {
     "port": "8080",
-    "gitRepo": "https://github.com/mirkobrombin/chronos-test"
+    "gitRepos": [
+        {
+            "id": "remote1",
+            "url": "https://github.com/Vanilla-OS/documentation"
+        }
+    ],
+    "localRepos": []
 }
