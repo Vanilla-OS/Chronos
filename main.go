@@ -52,7 +52,7 @@ func main() {
 
 	// Start the server
 	fmt.Printf("Server listening on port %s...\n", settings.Cnf.Port)
-	fmt.Printf("Address: http://localhost:%s\n", settings.Cnf.Port)
+	fmt.Printf("Address: http://0.0.0.0:%s\n", settings.Cnf.Port)
 	fmt.Println("Press Ctrl+C to exit.")
-	http.ListenAndServe(fmt.Sprintf(":%s", settings.Cnf.Port), nil)
+	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", settings.Cnf.Port), nil)
 }
