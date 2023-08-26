@@ -17,7 +17,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-func synGitRepo(repo string) error {
+func synGitRepo(repo string, force bool) error {
 	repoDir := reposDir + strings.ReplaceAll(repo, "/", "_")
 
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
@@ -43,7 +43,13 @@ func synGitRepo(repo string) error {
 		origin := remotes[0].Config().URLs[0]
 
 		if origin != repo {
-			confirmation := askForConfirmation("The Git repository has been modified. Do you want to overwrite the current one?")
+			var confirmation bool
+
+			if !force {
+				confirmation = askForConfirmation("The Git repository has been modified. Do you want to overwrite the current one?")
+			} else {
+				confirmation = true
+			}
 
 			if confirmation {
 				err := os.RemoveAll(repoDir)
@@ -73,4 +79,29 @@ func synGitRepo(repo string) error {
 	}
 
 	return nil
+}
+
+func detectGitChanges(repo string) (bool, error) {
+	repoDir := reposDir + strings.ReplaceAll(repo, "/", "_")
+
+	r, err := git.PlainOpen(repoDir)
+	if err != nil {
+		return false, fmt.Errorf("failed to open Git repository: %v", err)
+	}
+
+	w, err := r.Worktree()
+	if err != nil {
+		return false, fmt.Errorf("failed to open Git worktree: %v", err)
+	}
+
+	status, err := w.Status()
+	if err != nil {
+		return false, fmt.Errorf("failed to get Git status: %v", err)
+	}
+
+	if status.IsClean() {
+		return false, nil
+	}
+
+	return true, nil
 }

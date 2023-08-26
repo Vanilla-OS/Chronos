@@ -1,5 +1,6 @@
 {
     "port": "8080",
+    "backgroundCacheUpdate": "true",
     "gitRepos": [
         {
             "id": "remote1",

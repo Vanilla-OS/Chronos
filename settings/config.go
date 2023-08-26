@@ -5,9 +5,10 @@ import (
 )
 
 type Config struct {
-	Port       string            `json:"port"`
-	GitRepos   []ConfigGitRepo   `json:"gitRepos"`
-	LocalRepos []ConfigLocalRepo `json:"localRepos"`
+	Port                  string            `json:"port"`
+	GitRepos              []ConfigGitRepo   `json:"gitRepos"`
+	LocalRepos            []ConfigLocalRepo `json:"localRepos"`
+	BackgroundCacheUpdate bool              `json:"backgroundCacheUpdate"`
 }
 
 type ConfigGitRepo struct {
@@ -58,8 +59,9 @@ func init() {
 	}
 
 	Cnf = &Config{
-		Port:       viper.GetString("port"),
-		GitRepos:   gitRepos,
-		LocalRepos: localRepos,
+		Port:                  viper.GetString("port"),
+		GitRepos:              gitRepos,
+		LocalRepos:            localRepos,
+		BackgroundCacheUpdate: viper.GetBool("backgroundCacheUpdate"),
 	}
 }
