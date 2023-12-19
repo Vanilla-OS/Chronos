@@ -3,7 +3,6 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
 
 env:
     REGISTRY_USER: ${{ github.actor }}
@@ -25,7 +24,7 @@ jobs:
 
       # Push the image to GHCR (Image Registry)
       - name: Push To GHCR
-        if: github.repository == 'Vanilla-OS/Chronos' && github.ref == 'refs/heads/main'
+        if: github.repository == 'Vanilla-OS/Chronos'
         run: |
           docker tag vanilla-os/chronos:${{ github.ref_name }} ghcr.io/vanilla-os/chronos:${{ github.ref_name }}
           docker login ghcr.io -u ${{ env.REGISTRY_USER }} -p ${{ env.REGISTRY_PASSWORD }}
