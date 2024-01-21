@@ -34,6 +34,11 @@ func LoadChronos() {
 
 	prepareCache()
 
+	err := prepareRepos(true)
+	if err != nil {
+		panic(err)
+	}
+
 	if settings.Cnf.BackgroundCacheUpdate {
 		go backgroundCacheUpdate(15 * time.Minute)
 	}
@@ -119,7 +124,7 @@ func prepareRepos(needSyncGit bool) error {
 // backgroundCacheUpdate updates the cache in the background.
 func backgroundCacheUpdate(interval time.Duration) {
 	for {
-		fmt.Printf("\nStarting background cache update")
+		fmt.Println("Starting background cache update...")
 
 		for _, repo := range settings.Cnf.GitRepos {
 			changed, err := detectGitChanges(repo.Url)
