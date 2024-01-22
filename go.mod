@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/dgraph-io/ristretto v0.1.1
-	github.com/eko/gocache/lib/v4 v4.1.4
+	github.com/eko/gocache/lib/v4 v4.1.5
 	github.com/eko/gocache/store/ristretto/v4 v4.2.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/gorilla/mux v1.8.0
