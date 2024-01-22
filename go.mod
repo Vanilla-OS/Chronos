@@ -7,7 +7,7 @@ require (
 	github.com/eko/gocache/lib/v4 v4.1.5
 	github.com/eko/gocache/store/ristretto/v4 v4.2.1
 	github.com/go-git/go-git/v5 v5.11.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/viper v1.16.0
 )
