@@ -12,13 +12,17 @@ type Config struct {
 }
 
 type ConfigGitRepo struct {
-	Id  string `json:"id"`
-	Url string `json:"url"`
+	Id           string `json:"id"`
+	Url          string `json:"url"`
+	RootPath     string `json:"rootPath"`
+	FallbackLang string `json:"fallbackLang"`
 }
 
 type ConfigLocalRepo struct {
-	Id   string `json:"id"`
-	Path string `json:"path"`
+	Id           string `json:"id"`
+	Path         string `json:"path"`
+	RootPath     string `json:"rootPath"`
+	FallbackLang string `json:"fallbackLang"`
 }
 
 var Cnf *Config

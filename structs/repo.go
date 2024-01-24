@@ -15,6 +15,9 @@ type Repo struct {
 	Articles        map[string]Article
 	ArticlesGrouped map[string][]Article
 	Languages       []string
+	RootPath        string
+	FallbackLang    string
+	FallbackEnabled bool
 }
 
 func (r *Repo) IsLangSupported(lang string) bool {

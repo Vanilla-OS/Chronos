@@ -52,6 +52,11 @@ func prepareRepos(needSyncGit bool) error {
 	fmt.Println("Preparing Git repositories cache")
 
 	for _, repo := range settings.Cnf.GitRepos {
+		rootPath := "articles"
+		if repo.RootPath != "" {
+			rootPath = repo.RootPath
+		}
+
 		if needSyncGit {
 			fmt.Printf("Synchronizing Git repository: %s\n", repo.Url)
 			err := synGitRepo(repo.Url, false)
@@ -61,20 +66,25 @@ func prepareRepos(needSyncGit bool) error {
 		}
 
 		_repo := structs.Repo{
-			Id:   repo.Id,
-			Path: reposDir + strings.ReplaceAll(repo.Url, "/", "_"),
+			Id:           repo.Id,
+			Path:         reposDir + strings.ReplaceAll(repo.Url, "/", "_"),
+			RootPath:     rootPath,
+			FallbackLang: repo.FallbackLang,
 		}
 
-		_repo.Languages, err = getRepoLanguages(_repo)
+		fmt.Printf("Loading languages for Git repository: %s\n", repo.Url)
+		_repo.Languages, err = getRepoLanguages(&_repo)
 		if err != nil {
 			return err
 		}
 
+		fmt.Printf("Loading articles for Git repository: %s\n", repo.Url)
 		_repo.Articles, err = getRepoArticles(_repo)
 		if err != nil {
 			return err
 		}
 
+		fmt.Printf("Grouping articles for Git repository: %s\n", repo.Url)
 		_repo.ArticlesGrouped, err = groupArticles(_repo)
 		if err != nil {
 			return err
@@ -86,21 +96,31 @@ func prepareRepos(needSyncGit bool) error {
 	fmt.Println("Preparing local repositories cache")
 
 	for _, repo := range settings.Cnf.LocalRepos {
-		_repo := structs.Repo{
-			Id:   repo.Id,
-			Path: repo.Path,
+		rootPath := "articles"
+		if repo.Path != "" {
+			rootPath = repo.RootPath
 		}
 
-		_repo.Languages, err = getRepoLanguages(_repo)
+		_repo := structs.Repo{
+			Id:           repo.Id,
+			Path:         repo.Path,
+			RootPath:     rootPath,
+			FallbackLang: repo.FallbackLang,
+		}
+
+		fmt.Printf("Loading languages for local repository: %s\n", repo.Path)
+		_repo.Languages, err = getRepoLanguages(&_repo)
 		if err != nil {
 			return err
 		}
 
+		fmt.Printf("Loading articles for local repository: %s\n", repo.Path)
 		_repo.Articles, err = getRepoArticles(_repo)
 		if err != nil {
 			return err
 		}
 
+		fmt.Printf("Grouping articles for local repository: %s\n", repo.Path)
 		_repo.ArticlesGrouped, err = groupArticles(_repo)
 		if err != nil {
 			return err
@@ -152,7 +172,7 @@ func backgroundCacheUpdate(interval time.Duration) {
 }
 
 // getRepoLanguages populates the language cache.
-func getRepoLanguages(repo structs.Repo) ([]string, error) {
+func getRepoLanguages(repo *structs.Repo) ([]string, error) {
 	langs, err := loadLanguagesFromRepo(repo)
 	if err != nil {
 		return nil, err
@@ -174,17 +194,26 @@ func getRepoArticles(repo structs.Repo) (map[string]structs.Article, error) {
 	tmpArticleCache := make(map[string]structs.Article)
 	tmpArticleCacheGrouped := make(map[string]map[string]structs.Article)
 	for _, articlePath := range articlePaths {
-		article, err := loadArticle(articlePath)
+		article, err := loadArticle(repo, articlePath)
 		if err != nil {
 			return nil, err
 		}
 
 		tmpArticleCache[articlePath] = article
 
-		lang := strings.Split(articlePath, string(filepath.Separator))[1]
-		if lang == "articles" {
+		var lang string
+		if repo.FallbackEnabled {
+			lang = repo.FallbackLang
+			if lang == "" {
+				lang = "en"
+			}
+		} else {
 			lang = strings.Split(articlePath, string(filepath.Separator))[2]
+			if lang == repo.RootPath {
+				lang = strings.Split(articlePath, string(filepath.Separator))[3]
+			}
 		}
+
 		if _, ok := tmpArticleCacheGrouped[lang]; !ok {
 			tmpArticleCacheGrouped[lang] = make(map[string]structs.Article)
 		}
@@ -206,9 +235,9 @@ func groupArticles(repo structs.Repo) (map[string][]structs.Article, error) {
 }
 
 // loadLanguagesFromRepo returns a list of languages from the repo folder.
-func loadLanguagesFromRepo(repo structs.Repo) ([]string, error) {
+func loadLanguagesFromRepo(repo *structs.Repo) ([]string, error) {
 	langs := make([]string, 0)
-	dirEntries, err := os.ReadDir(filepath.Join(repo.Path, "articles"))
+	dirEntries, err := os.ReadDir(filepath.Join(repo.Path, repo.RootPath))
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +251,11 @@ func loadLanguagesFromRepo(repo structs.Repo) ([]string, error) {
 	}
 
 	if len(langs) == 0 {
-		return nil, errors.New("no languages found")
+		if repo.FallbackLang == "" {
+			fmt.Printf("No languages found for repo: %s, assuming English\n", repo.Path)
+			langs = append(langs, "en")
+			repo.FallbackEnabled = true
+		}
 	}
 
 	return langs, nil
@@ -233,7 +266,18 @@ func loadArticlesFromRepo(repo structs.Repo) ([]string, error) {
 	articles := make([]string, 0)
 
 	for _, lang := range repo.Languages {
-		langDir := filepath.Join(repo.Path, "articles", lang)
+		langDir := filepath.Join(repo.Path, repo.RootPath, lang)
+		// if langDir does not exist, assuming we are in a fallback language
+		// situation and we should use the root path instead
+		if _, err := os.Stat(langDir); os.IsNotExist(err) {
+			langDir = filepath.Join(repo.Path, repo.RootPath)
+		}
+		// if still langDir does not exist, we have a problem, well, the user
+		// has a problem, we just panic
+		if _, err := os.Stat(langDir); os.IsNotExist(err) {
+			return nil, errors.New("no articles found")
+		}
+
 		dirEntries, err := os.ReadDir(langDir)
 		if err != nil {
 			return nil, err
@@ -257,7 +301,7 @@ func loadArticlesFromRepo(repo structs.Repo) ([]string, error) {
 }
 
 // loadArticle loads an article from the specified path.
-func loadArticle(path string) (structs.Article, error) {
+func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return structs.Article{}, err
@@ -273,7 +317,16 @@ func loadArticle(path string) (structs.Article, error) {
 
 	title, description, publicationDate, authors := parseArticleHeader(header)
 	slug := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
-	lang := strings.Split(path, string(filepath.Separator))[3]
+
+	var lang string
+	if repo.FallbackEnabled {
+		lang = repo.FallbackLang
+		if lang == "" {
+			lang = "en"
+		}
+	} else {
+		lang = strings.Split(path, string(filepath.Separator))[3]
+	}
 
 	article := structs.Article{
 		Title:           title,
