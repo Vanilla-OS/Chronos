@@ -208,10 +208,8 @@ func getRepoArticles(repo structs.Repo) (map[string]structs.Article, error) {
 				lang = "en"
 			}
 		} else {
-			lang = strings.Split(articlePath, string(filepath.Separator))[2]
-			if lang == repo.RootPath {
-				lang = strings.Split(articlePath, string(filepath.Separator))[3]
-			}
+			furtherPath := strings.TrimPrefix(articlePath, filepath.Join(repo.Path, repo.RootPath))
+			lang = strings.Split(furtherPath, string(filepath.Separator))[1]
 		}
 
 		if _, ok := tmpArticleCacheGrouped[lang]; !ok {
@@ -325,7 +323,8 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 			lang = "en"
 		}
 	} else {
-		lang = strings.Split(path, string(filepath.Separator))[3]
+		furtherPath := strings.TrimPrefix(path, filepath.Join(repo.Path, repo.RootPath))
+		lang = strings.Split(furtherPath, string(filepath.Separator))[1]
 	}
 
 	article := structs.Article{
