@@ -16,6 +16,7 @@ type Article struct {
 	Description     string
 	PublicationDate string
 	Authors         []string
+	Tags            []string
 	Body            string
 	Language        string
 	Path            string
@@ -27,4 +28,12 @@ type Article struct {
 func (a *Article) ParseBody() {
 	parsedBody := blackfriday.Run([]byte(a.Body))
 	a.Body = string(parsedBody)
+}
+
+type ArticleHeader struct {
+	Title           string   `yaml:"Title"`
+	Description     string   `yaml:"Description"`
+	PublicationDate string   `yaml:"PublicationDate"`
+	Authors         []string `yaml:"Authors"`
+	Tags            []string `yaml:"Tags"`
 }

@@ -10,38 +10,18 @@ package core
 */
 
 import (
-	"strings"
+	"github.com/vanilla-os/Chronos/structs"
+	"gopkg.in/yaml.v3"
 )
 
-// parseArticleHeader parses the header of an article and extracts the details
-// like title, description, publication date and authors.
-func parseArticleHeader(header string) (string, string, string, []string) {
-	title := ""
-	description := ""
-	publicationDate := ""
-	authors := make([]string, 0)
-
-	lines := strings.Split(header, "\n")
-	for _, line := range lines {
-		parts := strings.SplitN(line, ":", 2)
-		if len(parts) != 2 {
-			continue
-		}
-
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-
-		switch key {
-		case "Title":
-			title = value
-		case "Description":
-			description = value
-		case "PublicationDate":
-			publicationDate = value
-		case "Authors":
-			authors = strings.Split(value, ",")
-		}
+// parseArticleHeader parses the YAML header of an article and returns a
+// structs.ArticleHeader object.
+func parseArticleHeader(header string) (structs.ArticleHeader, error) {
+	var articleHeader structs.ArticleHeader
+	err := yaml.Unmarshal([]byte(header), &articleHeader)
+	if err != nil {
+		return structs.ArticleHeader{}, err
 	}
 
-	return title, description, publicationDate, authors
+	return articleHeader, nil
 }

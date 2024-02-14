@@ -43,10 +43,13 @@ func HandleArticles(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/%s/articles/en", repoId), http.StatusFound)
 	}
 
+	articles := repo.ArticlesGrouped[lang]
+	tags := getTags(articles)
 	response := structs.ArticlesResponse{
 		Title:         repo.Id,
 		SupportedLang: repo.Languages,
-		Articles:      repo.ArticlesGrouped[lang],
+		Tags:          tags,
+		Articles:      articles,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -58,4 +61,20 @@ func HandleArticles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(jsonData)
+}
+
+func getTags(articles []structs.Article) []string {
+	tags := make(map[string]bool)
+	for _, article := range articles {
+		for _, tag := range article.Tags {
+			tags[tag] = true
+		}
+	}
+
+	var tagsList []string
+	for tag := range tags {
+		tagsList = append(tagsList, tag)
+	}
+
+	return tagsList
 }

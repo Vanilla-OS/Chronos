@@ -13,5 +13,6 @@ package structs
 type ArticlesResponse struct {
 	Title         string    `json:"title"`
 	SupportedLang []string  `json:"SupportedLang"`
+	Tags          []string  `json:"tags"`
 	Articles      []Article `json:"articles"`
 }

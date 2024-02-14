@@ -310,10 +310,14 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 		return structs.Article{}, fmt.Errorf("invalid article format: %s", path)
 	}
 
-	header := parts[0]
+	rawHeader := parts[0]
 	body := parts[1]
 
-	title, description, publicationDate, authors := parseArticleHeader(header)
+	header, err := parseArticleHeader(rawHeader)
+	if err != nil {
+		return structs.Article{}, err
+	}
+
 	slug := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 
 	var lang string
@@ -328,10 +332,11 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 	}
 
 	article := structs.Article{
-		Title:           title,
-		Description:     description,
-		PublicationDate: publicationDate,
-		Authors:         authors,
+		Title:           header.Title,
+		Description:     header.Description,
+		PublicationDate: header.PublicationDate,
+		Authors:         header.Authors,
+		Tags:            header.Tags,
 		Body:            body,
 		Path:            path,
 		Url:             strings.TrimSuffix(path, filepath.Ext(path)),
