@@ -127,6 +127,10 @@ Get a list of articles, grouped by language.
 {
   "title": "repoId",
   "SupportedLang": ["en", "it"],
+  "tags": [
+    "tag1",
+    "tag2",
+  ],
   "articles": {
     "en": {
       "articles_repo/articles/en/test.md": {
@@ -134,6 +138,10 @@ Get a list of articles, grouped by language.
         "Description": "This is a test article written in English.",
         "PublicationDate": "2023-06-10",
         "Authors": ["mirkobrombin"],
+        "Tags": [
+          "tag1",
+          "tag2"
+        ],
         "Body": "..."
       }
     },
@@ -143,6 +151,9 @@ Get a list of articles, grouped by language.
         "Description": "Questo è un articolo di test scritto in italiano.",
         "PublicationDate": "2023-06-10",
         "Authors": ["mirkobrombin"],
+        "Tags": [
+          "tag2"
+        ],
         "Body": "..."
       }
     }
