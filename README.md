@@ -51,6 +51,11 @@ Repositories can be configured in the `chronos.json` file as follows:
         {
             "id": "vosDocs",
             "url": "https://github.com/Vanilla-OS/documentation"
+        },
+        {
+            "id": "vosVib",
+            "url": "https://github.com/Vanilla-OS/vib",
+            "rootPath": "docs/articles"
         }
     ],
     "localRepos": [
@@ -83,9 +88,29 @@ documentation
 You can use a Git repositories as well, just add them to the `GitRepos` array in the `chronos.json` file,
 Chronos will automatically clone them and update on each restart.
 
-### Background updates
+## Background updates
 
-In the current version, automatic updates are not supported.
+In the current version, automatic updates are in experimental stage and are not yet fully implemented.
+
+## Article Structure
+
+Each article must have a specific structure, here's an example:
+
+```markdown
+---
+Title: My Awesome Article
+Description: This is a test article written in English.
+PublicationDate: 2024-02-16
+Authors: [johnDoe]
+Tags: [tag1, tag2]
+---
+
+# My Awesome Article
+
+This is a test article written in English.
+```
+
+The article must start with a YAML header, followed by the article body.
 
 ## API Reference
 
