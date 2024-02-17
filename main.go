@@ -11,7 +11,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/vanilla-os/Chronos/core"
@@ -21,7 +23,11 @@ import (
 var version = "0.2.0"
 
 func main() {
-	core.LoadChronos()
+	err := core.LoadChronos()
+	if err != nil {
+		log.Printf("unable to load Chronos: %s", err.Error())
+		os.Exit(1)
+	}
 
 	// CORS middleware
 	corsMiddleware := func(next http.Handler) http.Handler {
@@ -42,6 +48,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok", "version": "` + version + `"}`))
 	})
+	r.HandleFunc("/repos", core.HandleRepos)
 	r.HandleFunc("/{repoId}", core.HandleRepo)
 	r.HandleFunc("/{repoId}/langs", core.HandleLangs)
 	r.HandleFunc("/{repoId}/articles/{lang}", core.HandleArticles)
@@ -51,8 +58,8 @@ func main() {
 	http.Handle("/", r)
 
 	// Start the server
-	fmt.Printf("Server listening on port %s...\n", settings.Cnf.Port)
-	fmt.Printf("Address: http://0.0.0.0:%s\n", settings.Cnf.Port)
-	fmt.Println("Press Ctrl+C to exit.")
+	log.Printf("Chronos listening on port %s...\n", settings.Cnf.Port)
+	log.Printf("Address: http://0.0.0.0:%s\n", settings.Cnf.Port)
+	log.Println("Press Ctrl+C to exit.")
 	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", settings.Cnf.Port), nil)
 }

@@ -21,16 +21,18 @@ var (
 	cacheManager *cache.Cache[[]byte]
 )
 
-func prepareCache() {
+func prepareCache() (err error) {
 	ristrettoCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: 1000,
 		MaxCost:     100,
 		BufferItems: 64,
 	})
 	if err != nil {
-		fmt.Println("Error while creating cache manager")
-		panic(err)
+		return fmt.Errorf("unable to create ristretto cache: %w", err)
 	}
+
 	ristrettoStore := ristretto_store.NewRistretto(ristrettoCache)
 	cacheManager = cache.New[[]byte](ristrettoStore)
+
+	return nil
 }

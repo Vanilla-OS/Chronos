@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,21 +28,29 @@ var (
 	reposDir = "repos/"
 )
 
-func LoadChronos() {
-	if _, err := os.Stat(reposDir); os.IsNotExist(err) {
+// LoadChronos loads the Chronos server, preparing the cache and start the
+// background cache update if configured.
+func LoadChronos() (err error) {
+	_, err = os.Stat(reposDir)
+	if os.IsNotExist(err) {
 		os.MkdirAll(reposDir, 0755)
 	}
 
-	prepareCache()
-
-	err := prepareRepos(true)
+	err = prepareCache()
 	if err != nil {
-		panic(err)
+		return err
+	}
+
+	err = prepareRepos(true)
+	if err != nil {
+		return err
 	}
 
 	if settings.Cnf.BackgroundCacheUpdate {
 		go backgroundCacheUpdate(15 * time.Minute)
 	}
+
+	return nil
 }
 
 // prepareRepos prepares both local and Git repositories.
@@ -49,7 +58,7 @@ func prepareRepos(needSyncGit bool) error {
 	var repos []structs.Repo
 	var err error
 
-	fmt.Println("Preparing Git repositories cache")
+	log.Println("(loader): Preparing Git repositories cache")
 
 	for _, repo := range settings.Cnf.GitRepos {
 		rootPath := "articles"
@@ -58,7 +67,7 @@ func prepareRepos(needSyncGit bool) error {
 		}
 
 		if needSyncGit {
-			fmt.Printf("Synchronizing Git repository: %s\n", repo.Url)
+			log.Printf("(loader): Synchronizing Git repository: %s\n", repo.Url)
 			err := synGitRepo(repo.Url, false)
 			if err != nil {
 				return fmt.Errorf("failed to synchronize Git repository: %v", err)
@@ -72,19 +81,19 @@ func prepareRepos(needSyncGit bool) error {
 			FallbackLang: repo.FallbackLang,
 		}
 
-		fmt.Printf("Loading languages for Git repository: %s\n", repo.Url)
+		log.Printf("(loader): Loading languages for Git repository: %s\n", repo.Url)
 		_repo.Languages, err = getRepoLanguages(&_repo)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("Loading articles for Git repository: %s\n", repo.Url)
+		log.Printf("(loader): Loading articles for Git repository: %s\n", repo.Url)
 		_repo.Articles, err = getRepoArticles(_repo)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("Grouping articles for Git repository: %s\n", repo.Url)
+		log.Printf("(loader): Grouping articles for Git repository: %s\n", repo.Url)
 		_repo.ArticlesGrouped, err = groupArticles(_repo)
 		if err != nil {
 			return err
@@ -93,34 +102,34 @@ func prepareRepos(needSyncGit bool) error {
 		repos = append(repos, _repo)
 	}
 
-	fmt.Println("Preparing local repositories cache")
+	log.Println("(loader): Preparing local repositories cache")
 
 	for _, repo := range settings.Cnf.LocalRepos {
 		rootPath := "articles"
-		if repo.Path != "" {
+		if repo.Url != "" {
 			rootPath = repo.RootPath
 		}
 
 		_repo := structs.Repo{
 			Id:           repo.Id,
-			Path:         repo.Path,
+			Path:         repo.Url,
 			RootPath:     rootPath,
 			FallbackLang: repo.FallbackLang,
 		}
 
-		fmt.Printf("Loading languages for local repository: %s\n", repo.Path)
+		log.Printf("(loader): Loading languages for local repository: %s\n", repo.Url)
 		_repo.Languages, err = getRepoLanguages(&_repo)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("Loading articles for local repository: %s\n", repo.Path)
+		log.Printf("(loader): Loading articles for local repository: %s\n", repo.Url)
 		_repo.Articles, err = getRepoArticles(_repo)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("Grouping articles for local repository: %s\n", repo.Path)
+		log.Printf("(loader): Grouping articles for local repository: %s\n", repo.Url)
 		_repo.ArticlesGrouped, err = groupArticles(_repo)
 		if err != nil {
 			return err
@@ -131,12 +140,12 @@ func prepareRepos(needSyncGit bool) error {
 
 	reposBytes, err := json.Marshal(repos)
 	if err != nil {
-		fmt.Printf("Failed to marshal repos: %v\n", err)
+		log.Printf("(loader): Failed to marshal repos: %v\n", err)
 	}
 
 	cacheManager.Set(context.Background(), "Repos", reposBytes)
 
-	fmt.Printf("Finished preparing repositories cache: %d repos\n", len(repos))
+	log.Printf("(loader): Finished preparing repositories cache: %d repos\n", len(repos))
 
 	return nil
 }
@@ -144,29 +153,31 @@ func prepareRepos(needSyncGit bool) error {
 // backgroundCacheUpdate updates the cache in the background.
 func backgroundCacheUpdate(interval time.Duration) {
 	for {
-		fmt.Println("Starting background cache update...")
+		log.Println("(loader): Starting background cache update...")
 
 		for _, repo := range settings.Cnf.GitRepos {
 			changed, err := detectGitChanges(repo.Url)
 			if err != nil {
-				fmt.Printf("Failed to detect Git changes: %v\n", err)
+				log.Printf("(loader): Failed to detect Git changes: %v\n", err)
 			}
 
 			if changed {
 				err := synGitRepo(repo.Url, true)
 				if err != nil {
-					fmt.Printf("Failed to synchronize Git repository: %v\n", err)
+					log.Printf("(loader): Failed to synchronize Git repository: %v\n", err)
 				}
 			}
 		}
 
 		err := prepareRepos(false)
 		if err != nil {
-			panic(err)
+			log.Printf("(loader): Failed to prepare repos: %v\n", err)
+			continue
 		}
 
-		fmt.Println("Finished background cache update")
+		log.Println("(loader): Finished background cache update")
 
+		log.Printf("(loader): Sleeping for %s\n", interval)
 		time.Sleep(interval)
 	}
 }
@@ -178,8 +189,8 @@ func getRepoLanguages(repo *structs.Repo) ([]string, error) {
 		return nil, err
 	}
 
-	tmpLangCache := make([]string, 0)
-	tmpLangCache = append(tmpLangCache, langs...)
+	tmpLangCache := make([]string, len(langs))
+	copy(tmpLangCache, langs)
 
 	return tmpLangCache, nil
 }
@@ -191,7 +202,7 @@ func getRepoArticles(repo structs.Repo) (map[string]structs.Article, error) {
 		return nil, err
 	}
 
-	tmpArticleCache := make(map[string]structs.Article)
+	tmpArticleCache := make(map[string]structs.Article, len(articlePaths))
 	tmpArticleCacheGrouped := make(map[string]map[string]structs.Article)
 	for _, articlePath := range articlePaths {
 		article, err := loadArticle(repo, articlePath)
@@ -250,7 +261,7 @@ func loadLanguagesFromRepo(repo *structs.Repo) ([]string, error) {
 
 	if len(langs) == 0 {
 		if repo.FallbackLang == "" {
-			fmt.Printf("No languages found for repo: %s, assuming English\n", repo.Path)
+			log.Printf("(loader): No languages found for repo: %s, assuming English\n", repo.Path)
 			langs = append(langs, "en")
 			repo.FallbackEnabled = true
 		}
@@ -286,8 +297,7 @@ func loadArticlesFromRepo(repo structs.Repo) ([]string, error) {
 				continue
 			}
 
-			articlePath := filepath.Join(langDir, entry.Name())
-			articles = append(articles, articlePath)
+			articles = append(articles, filepath.Join(langDir, entry.Name()))
 		}
 	}
 
@@ -320,12 +330,9 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 
 	slug := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 
-	var lang string
-	if repo.FallbackEnabled {
-		lang = repo.FallbackLang
-		if lang == "" {
-			lang = "en"
-		}
+	lang := repo.FallbackLang
+	if repo.FallbackEnabled && lang == "" {
+		lang = "en"
 	} else {
 		furtherPath := strings.TrimPrefix(path, filepath.Join(repo.Path, repo.RootPath))
 		lang = strings.Split(furtherPath, string(filepath.Separator))[1]

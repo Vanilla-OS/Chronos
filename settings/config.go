@@ -5,22 +5,15 @@ import (
 )
 
 type Config struct {
-	Port                  string            `json:"port"`
-	GitRepos              []ConfigGitRepo   `json:"gitRepos"`
-	LocalRepos            []ConfigLocalRepo `json:"localRepos"`
-	BackgroundCacheUpdate bool              `json:"backgroundCacheUpdate"`
+	Port                  string       `json:"port"`
+	GitRepos              []ConfigRepo `json:"gitRepos"`
+	LocalRepos            []ConfigRepo `json:"localRepos"`
+	BackgroundCacheUpdate bool         `json:"backgroundCacheUpdate"`
 }
 
-type ConfigGitRepo struct {
+type ConfigRepo struct {
 	Id           string `json:"id"`
 	Url          string `json:"url"`
-	RootPath     string `json:"rootPath"`
-	FallbackLang string `json:"fallbackLang"`
-}
-
-type ConfigLocalRepo struct {
-	Id           string `json:"id"`
-	Path         string `json:"path"`
 	RootPath     string `json:"rootPath"`
 	FallbackLang string `json:"fallbackLang"`
 }
@@ -50,13 +43,13 @@ func init() {
 		panic(err)
 	}
 
-	var gitRepos []ConfigGitRepo
+	var gitRepos []ConfigRepo
 	err = viper.UnmarshalKey("gitRepos", &gitRepos)
 	if err != nil {
 		panic(err)
 	}
 
-	var localRepos []ConfigLocalRepo
+	var localRepos []ConfigRepo
 	err = viper.UnmarshalKey("localRepos", &localRepos)
 	if err != nil {
 		panic(err)

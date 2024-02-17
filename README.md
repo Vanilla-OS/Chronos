@@ -46,24 +46,24 @@ Repositories can be configured in the `chronos.json` file as follows:
 
 ```json
 {
-    "port": "8080",
-    "gitRepos": [
-        {
-            "id": "vosDocs",
-            "url": "https://github.com/Vanilla-OS/documentation"
-        },
-        {
-            "id": "vosVib",
-            "url": "https://github.com/Vanilla-OS/vib",
-            "rootPath": "docs/articles"
-        }
-    ],
-    "localRepos": [
-        {
-            "id": "myAwesomeProject",
-            "path": "/myAwesomeProject/documentation"
-        }
-    ]
+  "port": "8080",
+  "gitRepos": [
+    {
+      "id": "vosDocs",
+      "url": "https://github.com/Vanilla-OS/documentation"
+    },
+    {
+      "id": "vosVib",
+      "url": "https://github.com/Vanilla-OS/vib",
+      "rootPath": "docs/articles"
+    }
+  ],
+  "localRepos": [
+    {
+      "id": "myAwesomeProject",
+      "path": "/myAwesomeProject/documentation"
+    }
+  ]
 }
 ```
 
@@ -140,6 +140,54 @@ Check if a repository is available.
 }
 ```
 
+### Get Repos
+
+Get a list of available repositories.
+
+- **URL**: `http://localhost:8080/repos`
+- **Method**: GET
+- **Response**:
+
+```json
+
+  {
+    "Id": "remote1",
+    "Count": 52,
+    "Languages": [
+      "bn",
+      "de",
+      "en",
+      "es",
+      "fr",
+      "pl",
+      "ta",
+      "th",
+      "uk"
+    ],
+    "FallbackLang": "",
+    "FallbackEnabled": false
+  },
+  {
+    "Id": "remote2",
+    "Count": 8,
+    "Languages": [
+      "en"
+    ],
+    "FallbackLang": "",
+    "FallbackEnabled": false
+  },
+  {
+    "Id": "remote3",
+    "Count": 1,
+    "Languages": [
+      "en"
+    ],
+    "FallbackLang": "",
+    "FallbackEnabled": true
+  }
+]
+```
+
 ### Get Articles
 
 Get a list of articles, grouped by language.
@@ -152,10 +200,7 @@ Get a list of articles, grouped by language.
 {
   "title": "repoId",
   "SupportedLang": ["en", "it"],
-  "tags": [
-    "tag1",
-    "tag2",
-  ],
+  "tags": ["tag1", "tag2"],
   "articles": {
     "en": {
       "articles_repo/articles/en/test.md": {
@@ -163,10 +208,7 @@ Get a list of articles, grouped by language.
         "Description": "This is a test article written in English.",
         "PublicationDate": "2023-06-10",
         "Authors": ["mirkobrombin"],
-        "Tags": [
-          "tag1",
-          "tag2"
-        ],
+        "Tags": ["tag1", "tag2"],
         "Body": "..."
       }
     },
@@ -176,9 +218,7 @@ Get a list of articles, grouped by language.
         "Description": "Questo è un articolo di test scritto in italiano.",
         "PublicationDate": "2023-06-10",
         "Authors": ["mirkobrombin"],
-        "Tags": [
-          "tag2"
-        ],
+        "Tags": ["tag2"],
         "Body": "..."
       }
     }
