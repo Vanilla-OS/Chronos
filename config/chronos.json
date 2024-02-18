@@ -5,7 +5,13 @@
         {
             "id": "remote1",
             "url": "https://github.com/Vanilla-OS/documentation"
+        },
+        {
+            "id": "remote2",
+            "url": "https://github.com/Vanilla-OS/vib",
+            "rootPath": "docs/articles"
         }
     ],
-    "localRepos": []
+    "localRepos": [],
+    "cacheBackend": "ristretto"
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/vanilla-os/Chronos/structs"
@@ -19,8 +20,16 @@ import (
 
 func HandleRepos(w http.ResponseWriter, r *http.Request) {
 	reposBytes, err := cacheManager.Get(context.Background(), "Repos")
-	if reposBytes == nil || err != nil {
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "unable to get Repos from cache"}`))
+		log.Printf("unable to get Repos from cache: %s", err.Error())
+		return
+	}
+	if reposBytes == nil {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"error": "Repos not found"}`))
+		log.Printf("Repos not available in cache, this might be a backend issue")
 		return
 	}
 
@@ -28,6 +37,8 @@ func HandleRepos(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(reposBytes, &repos)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "unable to unmarshal Repos"}`))
+		log.Printf("unable to unmarshal Repos: %s", err.Error())
 		return
 	}
 

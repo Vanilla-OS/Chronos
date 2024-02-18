@@ -3,13 +3,19 @@ module github.com/vanilla-os/Chronos
 go 1.20
 
 require (
+	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/eko/gocache/lib/v4 v4.1.5
+	github.com/eko/gocache/store/bigcache/v4 v4.2.1
+	github.com/eko/gocache/store/go_cache/v4 v4.2.1
 	github.com/eko/gocache/store/ristretto/v4 v4.2.1
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/gorilla/mux v1.8.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/redis/go-redis/v9 v9.4.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/viper v1.18.2
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -23,9 +29,10 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -67,5 +74,4 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

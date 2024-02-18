@@ -9,6 +9,14 @@ type Config struct {
 	GitRepos              []ConfigRepo `json:"gitRepos"`
 	LocalRepos            []ConfigRepo `json:"localRepos"`
 	BackgroundCacheUpdate bool         `json:"backgroundCacheUpdate"`
+	CacheBackend          string       `json:"cacheBackend"`
+
+	// Redis specific settings
+	RedisCacheServer   string `json:"redisCacheServer"`
+	RedisCachePort     string `json:"redisCachePort"`
+	RedisCacheUsername string `json:"redisCacheUsername"`
+	RedisCachePassword string `json:"redisCachePassword"`
+	RedisCacheDB       int    `json:"redisCacheDB"`
 }
 
 type ConfigRepo struct {
@@ -60,5 +68,12 @@ func init() {
 		GitRepos:              gitRepos,
 		LocalRepos:            localRepos,
 		BackgroundCacheUpdate: viper.GetBool("backgroundCacheUpdate"),
+		CacheBackend:          viper.GetString("cacheBackend"),
+
+		RedisCacheServer:   viper.GetString("redisCacheServer"),
+		RedisCachePort:     viper.GetString("redisCachePort"),
+		RedisCacheUsername: viper.GetString("redisCacheUsername"),
+		RedisCachePassword: viper.GetString("redisCachePassword"),
+		RedisCacheDB:       viper.GetInt("redisCacheDB"),
 	}
 }
