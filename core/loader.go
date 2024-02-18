@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/vanilla-os/Chronos/settings"
@@ -36,7 +37,7 @@ func LoadChronos() (err error) {
 		os.MkdirAll(reposDir, 0755)
 	}
 
-	err = prepareCache()
+	err = InitCacheManager()
 	if err != nil {
 		return err
 	}
@@ -47,10 +48,52 @@ func LoadChronos() (err error) {
 	}
 
 	if settings.Cnf.BackgroundCacheUpdate {
-		go backgroundCacheUpdate(15 * time.Minute)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go backgroundCacheUpdate(15*time.Minute, &wg)
+		wg.Wait()
 	}
 
 	return nil
+}
+
+// backgroundCacheUpdate updates the cache in the background.
+func backgroundCacheUpdate(interval time.Duration, wg *sync.WaitGroup) {
+	for {
+		log.Println("(loader): Starting background cache update...")
+
+		for _, repo := range settings.Cnf.GitRepos {
+			changed, err := detectGitChanges(repo.Url)
+			if err != nil {
+				log.Printf("(loader): Failed to detect Git changes: %v\n", err)
+			}
+
+			if changed {
+				err := synGitRepo(repo.Url, true)
+				if err != nil {
+					log.Printf("(loader): Failed to synchronize Git repository: %v\n", err)
+				}
+			}
+		}
+
+		err := prepareRepos(false)
+		if err != nil {
+			log.Printf("(loader): Failed to prepare repos: %v\n", err)
+			continue
+		}
+
+		log.Println("(loader): Finished background cache update")
+
+		if wg != nil {
+			wg.Done()
+			wg = nil
+		}
+
+		log.Printf("(loader): Sleeping for %s\n", interval)
+		time.Sleep(interval)
+
+		log.Println("(loader): Waking up for next background cache update")
+	}
 }
 
 // prepareRepos prepares both local and Git repositories.
@@ -148,38 +191,6 @@ func prepareRepos(needSyncGit bool) error {
 	log.Printf("(loader): Finished preparing repositories cache: %d repos\n", len(repos))
 
 	return nil
-}
-
-// backgroundCacheUpdate updates the cache in the background.
-func backgroundCacheUpdate(interval time.Duration) {
-	for {
-		log.Println("(loader): Starting background cache update...")
-
-		for _, repo := range settings.Cnf.GitRepos {
-			changed, err := detectGitChanges(repo.Url)
-			if err != nil {
-				log.Printf("(loader): Failed to detect Git changes: %v\n", err)
-			}
-
-			if changed {
-				err := synGitRepo(repo.Url, true)
-				if err != nil {
-					log.Printf("(loader): Failed to synchronize Git repository: %v\n", err)
-				}
-			}
-		}
-
-		err := prepareRepos(false)
-		if err != nil {
-			log.Printf("(loader): Failed to prepare repos: %v\n", err)
-			continue
-		}
-
-		log.Println("(loader): Finished background cache update")
-
-		log.Printf("(loader): Sleeping for %s\n", interval)
-		time.Sleep(interval)
-	}
 }
 
 // getRepoLanguages populates the language cache.
