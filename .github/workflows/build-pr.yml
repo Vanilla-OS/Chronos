@@ -1,10 +1,9 @@
-name: Docker Image CI
+name: Docker Image CI (PR)
 
 on:
   pull_request:
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -14,5 +13,14 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD) >> $GITHUB_OUTPUT"
 
+      - uses: vanilla-os/vib-gh-action@v0.6.2
+        with:
+          recipe: 'recipe.yml'
+
       - name: Build the Docker image
         run: docker build . --file Containerfile --tag vanilla-os/chronos:test
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Containerfile
+          path: Containerfile
