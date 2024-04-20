@@ -27,3 +27,4 @@ stages:
           - mv /sources/build-app /app
           - cd /app
           - go build -o chronos .
+          - mv /app /
