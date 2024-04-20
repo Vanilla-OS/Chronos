@@ -1,0 +1,29 @@
+name: Chronos Image
+id: chronos
+stages:
+  - id: build
+    base: ghcr.io/vanilla-os/pico:main
+    args:
+      DEBIAN_FRONTEND: noninteractive
+    runs:
+      - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
+    entrypoint: ["./chronos"]
+    modules:
+      - name: install-deps
+        type: apt
+        source:
+          packages:
+            - git
+            - golang
+            - nano
+      - name: build-app
+        type: shell
+        source:
+          type: git
+          url: https://github.com/Vanilla-OS/Chronos
+          branch: main
+          commit: latest
+        commands:
+          - mv /sources/build-app /app
+          - cd /app
+          - go build -o chronos .
