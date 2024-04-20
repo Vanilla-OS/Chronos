@@ -7,7 +7,6 @@ stages:
       DEBIAN_FRONTEND: noninteractive
     runs:
       - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
-    entrypoint: ["app/chronos"]
     modules:
       - name: install-deps
         type: apt
