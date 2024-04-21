@@ -5,6 +5,7 @@ stages:
     base: ghcr.io/vanilla-os/pico:main
     args:
       DEBIAN_FRONTEND: noninteractive
+    entrypoint: ["/app/chronos"]
     runs:
       - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
     modules:
