@@ -3,9 +3,12 @@ id: chronos
 stages:
   - id: build
     base: ghcr.io/vanilla-os/pico:main
+    singlelayer: false
+    labels:
+      maintainer: Vanilla OS Contributors
+    entrypoint: ["./app/chronos"]
     args:
       DEBIAN_FRONTEND: noninteractive
-    entrypoint: ["/app/chronos"]
     runs:
       - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
     modules:
@@ -27,3 +30,4 @@ stages:
           - mv /sources/build-app /app
           - cd /app
           - go build -o chronos .
+          - mv config /config
