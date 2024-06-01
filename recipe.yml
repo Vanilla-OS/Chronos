@@ -12,6 +12,11 @@ stages:
     runs:
       - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
     modules:
+      - name: update-repo
+        type: shell
+        commands:
+          - apt-get update
+
       - name: install-deps
         type: apt
         source:
@@ -19,6 +24,7 @@ stages:
             - git
             - golang
             - nano
+
       - name: build-app
         type: shell
         source:
