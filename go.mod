@@ -12,7 +12,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/gorilla/mux v1.8.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/redis/go-redis/v9 v9.5.2
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/viper v1.18.2
 	gopkg.in/yaml.v3 v3.0.1
