@@ -18,7 +18,7 @@ jobs:
       contents: write # Allow actions to write contents
       packages: write # Allow pushing images to GHCR
       attestations: write # To create and write attestations
-      id-token: write # Additional permissions for persistence of the attestations
+      id-token: write # Additional permissions for the persistence of the attestations
 
     steps:
     - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
       id: vars
       run: echo "sha_short=$(git rev-parse --short HEAD) >> $GITHUB_OUTPUT"
 
-    - uses: vanilla-os/vib-gh-action@v0.7.0
+    - uses: vanilla-os/vib-gh-action@v0.7.2
 
     - uses: actions/upload-artifact@v4
       with:
@@ -66,7 +66,7 @@ jobs:
 
     - name: Build and Push the Docker image
       id: push
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Containerfile
