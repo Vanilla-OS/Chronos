@@ -16,7 +16,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
