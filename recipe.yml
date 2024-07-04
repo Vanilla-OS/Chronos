@@ -7,9 +7,8 @@ stages:
     labels:
       maintainer: Vanilla OS Contributors
     entrypoint:
-      workdir: /app 
       exec:
-        - ./chronos
+        - ./app/chronos
     args:
       DEBIAN_FRONTEND: noninteractive
     runs:
