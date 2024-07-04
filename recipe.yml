@@ -6,11 +6,15 @@ stages:
     singlelayer: false
     labels:
       maintainer: Vanilla OS Contributors
-    entrypoint: ["./app/chronos"]
+    entrypoint:
+      workdir: /app 
+      exec:
+        - ./chronos
     args:
       DEBIAN_FRONTEND: noninteractive
     runs:
-      - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
+      commands:
+        - echo 'APT::Install-Recommends "0";' > /etc/apt/apt.conf.d/01norecommends
     modules:
       - name: update-repo
         type: shell
