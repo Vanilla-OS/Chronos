@@ -406,6 +406,7 @@ func loadStories(repo *structs.Repo) (map[string]structs.Story, error) {
 	storiesMap := make(map[string]structs.Story)
 	for _, story := range stories {
 		storiesMap[story.Id] = story
+		fmt.Printf("(loader): Loaded story: %s\n", story.Name)
 	}
 
 	return storiesMap, nil

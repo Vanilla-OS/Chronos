@@ -1,3 +1,4 @@
 - id: testing
   name: My First Story
   description: See how cool is my first story
+  startSlug: test
