@@ -11,8 +11,9 @@ package structs
 
 // ArticlesResponse is the response struct for the /articles endpoint.
 type ArticlesResponse struct {
-	Title         string    `json:"title"`
-	SupportedLang []string  `json:"SupportedLang"`
-	Tags          []string  `json:"tags"`
-	Articles      []Article `json:"articles"`
+	Title         string           `json:"title"`
+	SupportedLang []string         `json:"SupportedLang"`
+	Tags          []string         `json:"tags"`
+	Articles      []Article        `json:"articles"`
+	Stories       map[string]Story `json:"stories"`
 }

@@ -50,6 +50,7 @@ func HandleArticles(w http.ResponseWriter, r *http.Request) {
 		SupportedLang: repo.Languages,
 		Tags:          tags,
 		Articles:      articles,
+		Stories:       repo.Stories,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
