@@ -12,6 +12,11 @@
             "rootPath": "docs/articles"
         }
     ],
-    "localRepos": [],
+    "localRepos": [
+        {
+            "id": "myAwesomeProject",
+            "path": "."
+        }
+    ],
     "cacheBackend": "ristretto"
 }

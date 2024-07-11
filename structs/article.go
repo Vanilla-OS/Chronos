@@ -12,6 +12,11 @@ package structs
 import "github.com/russross/blackfriday/v2"
 
 type Article struct {
+	StoryId         string
+	Story           *Story // runtime populated field
+	Previous        string
+	Next            string
+	Listed          bool
 	Title           string
 	Description     string
 	PublicationDate string
@@ -31,6 +36,10 @@ func (a *Article) ParseBody() {
 }
 
 type ArticleHeader struct {
+	StoryId         string   `yaml:"StoryId"`
+	Previous        string   `yaml:"Previous"`
+	Next            string   `yaml:"Next"`
+	Listed          bool     `yaml:"Listed"`
 	Title           string   `yaml:"Title"`
 	Description     string   `yaml:"Description"`
 	PublicationDate string   `yaml:"PublicationDate"`

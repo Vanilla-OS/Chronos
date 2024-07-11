@@ -23,6 +23,7 @@ import (
 
 	"github.com/vanilla-os/Chronos/settings"
 	"github.com/vanilla-os/Chronos/structs"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -130,6 +131,12 @@ func prepareRepos(needSyncGit bool) error {
 			return err
 		}
 
+		log.Printf("(loader): Loading stories for local repository: %s\n", repo.Url)
+		_repo.Stories, err = loadStories(&_repo)
+		if err != nil {
+			return err
+		}
+
 		log.Printf("(loader): Loading articles for Git repository: %s\n", repo.Url)
 		_repo.Articles, err = getRepoArticles(_repo)
 		if err != nil {
@@ -162,6 +169,12 @@ func prepareRepos(needSyncGit bool) error {
 
 		log.Printf("(loader): Loading languages for local repository: %s\n", repo.Url)
 		_repo.Languages, err = getRepoLanguages(&_repo)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("(loader): Loading stories for local repository: %s\n", repo.Url)
+		_repo.Stories, err = loadStories(&_repo)
 		if err != nil {
 			return err
 		}
@@ -349,7 +362,17 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 		lang = strings.Split(furtherPath, string(filepath.Separator))[1]
 	}
 
+	story, err := loadStory(repo, header.StoryId)
+	if err != nil {
+		return structs.Article{}, fmt.Errorf("failed to load story: %v", err)
+	}
+
 	article := structs.Article{
+		StoryId:         header.StoryId,
+		Story:           story,
+		Previous:        header.Previous,
+		Next:            header.Next,
+		Listed:          header.Listed,
 		Title:           header.Title,
 		Description:     header.Description,
 		PublicationDate: header.PublicationDate,
@@ -363,4 +386,45 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 	}
 
 	return article, nil
+}
+
+// loadStories loads all the stories from the stories.yml file in the repository.
+func loadStories(repo *structs.Repo) (map[string]structs.Story, error) {
+	storiesPath := filepath.Join(repo.Path, repo.RootPath, "stories.yml")
+	storiesFile, err := os.ReadFile(storiesPath)
+	if err != nil {
+		fmt.Printf("(loader): No stories file found for repo: %s\n", repo.Path)
+		return nil, nil // safe to ignore, stories file is optional
+	}
+
+	var stories []structs.Story
+	err = yaml.Unmarshal(storiesFile, &stories)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal stories file: %v", err)
+	}
+
+	storiesMap := make(map[string]structs.Story)
+	for _, story := range stories {
+		storiesMap[story.Id] = story
+	}
+
+	return storiesMap, nil
+}
+
+// loadStory loads a story from the repository's stories map using its ID.
+func loadStory(repo structs.Repo, storyId string) (*structs.Story, error) {
+	if storyId == "" {
+		return &structs.Story{}, nil // safe to ignore, stories are optional
+	}
+
+	if len(repo.Stories) == 0 || repo.Stories == nil {
+		return &structs.Story{}, fmt.Errorf("no stories found but requested story with ID %s", storyId)
+	}
+
+	story, exists := repo.Stories[storyId]
+	if !exists {
+		return &structs.Story{}, fmt.Errorf("story with ID %s not found", storyId)
+	}
+
+	return &story, nil
 }

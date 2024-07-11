@@ -12,6 +12,7 @@ package structs
 type Repo struct {
 	Id              string
 	Path            string
+	Stories         map[string]Story
 	Articles        map[string]Article
 	ArticlesGrouped map[string][]Article
 	Languages       []string
