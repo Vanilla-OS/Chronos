@@ -8,7 +8,9 @@ stages:
       maintainer: Vanilla OS Contributors
     entrypoint:
       exec:
-        - ./app/chronos
+        - /bin/sh
+        - '-c'
+        - cd /app && ./chronos
     args:
       DEBIAN_FRONTEND: noninteractive
     runs:
