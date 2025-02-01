@@ -7,7 +7,7 @@ toolchain go1.22.3
 require (
 	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/dgraph-io/ristretto v0.2.0
-	github.com/eko/gocache/lib/v4 v4.1.6
+	github.com/eko/gocache/lib/v4 v4.2.0
 	github.com/eko/gocache/store/bigcache/v4 v4.2.2
 	github.com/eko/gocache/store/go_cache/v4 v4.2.2
 	github.com/eko/gocache/store/ristretto/v4 v4.2.2
@@ -61,6 +61,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	go.uber.org/mock v0.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc // indirect
