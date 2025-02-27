@@ -15,7 +15,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/russross/blackfriday/v2"
 )
 
 func HandleArticle(w http.ResponseWriter, r *http.Request) {
@@ -38,9 +37,6 @@ func HandleArticle(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
-	parsedBody := blackfriday.Run([]byte(result.Body))
-	result.Body = string(parsedBody)
 
 	w.Header().Set("Content-Type", "application/json")
 

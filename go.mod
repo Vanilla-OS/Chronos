@@ -2,8 +2,6 @@ module github.com/vanilla-os/Chronos
 
 go 1.22
 
-toolchain go1.22.3
-
 require (
 	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/dgraph-io/ristretto v0.2.0
