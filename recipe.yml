@@ -27,7 +27,7 @@ stages:
         source:
           packages:
             - git
-            - golang
+            - golang-1.23-go
             - nano
 
       - name: build-app
