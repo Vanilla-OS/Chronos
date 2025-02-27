@@ -27,8 +27,15 @@ stages:
         source:
           packages:
             - git
-            - golang-1.23-go
             - nano
+            - wget
+      
+      - name: install-go
+        type: shell
+        commands:
+          - wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
+          - tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
+          - /usr/local/go/bin/go version
 
       - name: build-app
         type: shell
@@ -40,5 +47,5 @@ stages:
         commands:
           - mv /sources/build-app /app
           - cd /app
-          - go build -o chronos .
+          - /usr/local/go/bin/go build -o chronos .
           - mv config /config
