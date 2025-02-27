@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/russross/blackfriday/v2"
 	"github.com/vanilla-os/Chronos/settings"
 	"github.com/vanilla-os/Chronos/structs"
 	"gopkg.in/yaml.v3"
@@ -367,6 +368,8 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 		return structs.Article{}, fmt.Errorf("failed to load story: %v", err)
 	}
 
+	parsedBody := blackfriday.Run([]byte(body))
+
 	article := structs.Article{
 		StoryId:         header.StoryId,
 		Story:           story,
@@ -378,7 +381,7 @@ func loadArticle(repo structs.Repo, path string) (structs.Article, error) {
 		PublicationDate: header.PublicationDate,
 		Authors:         header.Authors,
 		Tags:            header.Tags,
-		Body:            body,
+		Body:            string(parsedBody), // Ora è HTML
 		Path:            path,
 		Url:             strings.TrimSuffix(path, filepath.Ext(path)),
 		Slug:            slug,
