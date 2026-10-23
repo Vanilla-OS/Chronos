@@ -2,7 +2,7 @@ name: Chronos Image
 id: chronos
 stages:
   - id: build
-    base: ghcr.io/vanilla-os/pico:main
+    base: ghcr.io/vanilla-os/pico:latest
     singlelayer: false
     labels:
       maintainer: Vanilla OS Contributors
